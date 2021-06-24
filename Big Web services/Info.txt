@@ -1,0 +1,41 @@
+--- Criar servidor
+
+New Project > Java Web > Web Application...
+Next
+Next
+Finish
+
+Editar "index.html".
+Criar class do serviço.
+
+--- Criar cliente
+
+New Project...
+
+Correr o servidor para gerar página web.
+Adicionar o nome da class do serviço ao final do URL (.../.../Hello).
+Copiar WSDL URL.
+
+[Right-click no projeto do cliente] > New > Web Service Client
+
+Paste WSDL URL.
+Finish
+
+--- Alterar IP no cliente
+
+Apagar ficheiros gerados.
+[Right-click no projeto do cliente] > New > Web Service Client...
+
+Clean and Build
+
+--- Alocar memória
+
+No servidor e cliente:
+
+Project > Properties > Run
+
+VM Options
+Servidor: VM Options: "-Xmx620m -Xms620m"
+Cliente: VM Options: "-Xmx2020m -Xms2020m"
+
+------

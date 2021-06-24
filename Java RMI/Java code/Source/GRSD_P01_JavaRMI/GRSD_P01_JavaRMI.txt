@@ -1,0 +1,7 @@
+package grsd_p01_javarmi;
+
+public class GRSD_P01_JavaRMI {
+
+    public static void main(String[] args) {
+    }
+}

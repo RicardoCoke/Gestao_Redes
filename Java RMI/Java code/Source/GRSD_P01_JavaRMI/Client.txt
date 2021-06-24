@@ -1,0 +1,74 @@
+package grsd_p01_javarmi;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Random;
+
+// Correr na VM2.
+public class Client {
+
+    public static void main(String[] args) throws MalformedURLException, IOException {
+
+        final String CSV_HEADER = ("Java RMI" + "," + "Local" + "\n"); // Cabeçalho do ficheiro output. (Opcional)
+        final String CSV_FILENAME = ("P01_log"); // Nome do ficheiro output.
+        final String SERVER_IP = "localhost"; //192.168.0.1
+        final int SERVER_PORT = 1234;
+        final int SAMPLE_NUMBER = 20;
+        final int TIMEOUT = 3000; // Em milisegundos.
+        final int START_PACKET_SIZE = 1; // Em bytes.
+        final int MAXIMUM_PACKET_SIZE = (int) 1e9; // Em bytes.
+
+        FileWriter logfile = new FileWriter(CSV_FILENAME + ".csv");
+        BufferedWriter logwrite = new BufferedWriter(logfile);
+
+        try {
+            Registry reg = LocateRegistry.getRegistry(SERVER_IP, SERVER_PORT);
+            ServiceInterface s = (ServiceInterface) reg.lookup("service_RMI");
+
+            logwrite.write(CSV_HEADER);
+            logwrite.write("Packet size (B)" + "," + "Time (ms)" + "," + "Time average (ms)" + "\n");
+
+            long tt = 0;
+            double t_average = 0;
+            int i;
+            for (int PacketSize = START_PACKET_SIZE; tt < TIMEOUT && PacketSize < MAXIMUM_PACKET_SIZE; PacketSize = PacketSize * 10) {
+                byte[] Packet = new byte[PacketSize];
+                if (PacketSize < 1e3) {
+                    System.out.println("\nPacket size: " + PacketSize + " B\n");
+                } else if (PacketSize < 1e6) {
+                    System.out.println("\nPacket size: " + PacketSize / 1e3 + " KB\n");
+                } else {
+                    System.out.println("\nPacket size: " + PacketSize / 1e6 + " MB\n");
+                }
+                for (i = 0; i < SAMPLE_NUMBER && tt < TIMEOUT; i++) {
+                    new Random().nextBytes(Packet);
+                    long t_start = System.currentTimeMillis();
+                    s.m(Packet);
+                    long t_finish = System.currentTimeMillis();
+                    tt = t_finish - t_start;
+                    t_average = t_average + tt;
+                    System.out.println("Sample index: " + (i + 1) + "/" + SAMPLE_NUMBER + "\n" + "Time: " + tt + " ms\n");
+                    logwrite.write(PacketSize + "," + tt + "\n");
+                }
+                if (i == SAMPLE_NUMBER) { // Esta condição só se verifica se todas as amostras tiverem sido recolhidas durante o ciclo "for" anterior.
+                    t_average = t_average / SAMPLE_NUMBER;
+                    System.out.println("Time average: " + t_average + " ms\n");
+                    logwrite.write(PacketSize + ",," + t_average + "\n");
+                    t_average = 0;
+                }
+            }
+            logwrite.flush();
+            logwrite.close();
+            System.out.println("\nEND");
+
+        } catch (RemoteException | NotBoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+}

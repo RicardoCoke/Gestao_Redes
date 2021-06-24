@@ -1,0 +1,9 @@
+package grsd_p01_javarmi;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface ServiceInterface extends Remote {
+
+    public void m(byte[] pac) throws RemoteException;
+}

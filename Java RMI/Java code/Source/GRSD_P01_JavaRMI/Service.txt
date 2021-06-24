@@ -1,0 +1,31 @@
+package grsd_p01_javarmi;
+
+import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+// Correr na VM1.
+public class Service implements ServiceInterface {
+
+    @Override
+    public void m(byte[] pac) {
+    }
+
+    public static void main(String[] args) throws MalformedURLException {
+
+        Service s = new Service();
+        int port = 1234;
+
+        try {
+            ServiceInterface proxy = (ServiceInterface) UnicastRemoteObject.exportObject(s, 0);
+            Registry reg = LocateRegistry.createRegistry(port);
+            reg.bind("service_RMI", proxy);
+
+        } catch (RemoteException | AlreadyBoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+}

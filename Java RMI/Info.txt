@@ -1,0 +1,19 @@
+---
+
+No servidor:
+
+Project > Properties > Run
+
+VM Options: "-Djava.rmi.server.hostname=192.168.0.1" (Substituir IP do serviço)
+
+Apagar o ficheiro .java que contém a classe main().
+
+--- Alocar memória
+
+No servidor e cliente:
+
+Project > Properties > Run
+
+VM Options: "-Xmx620m -Xms620m"
+
+------
